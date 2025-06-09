@@ -1,6 +1,9 @@
 To use this project
-step 1 -> npm i
+
+step 1 -> npm I
+
 step 2 -> npm run dev
+
 
 
 live sample of the project
