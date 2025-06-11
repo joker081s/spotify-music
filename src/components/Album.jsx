@@ -1,5 +1,6 @@
 import { albumsData } from "../assets/assets";
 import AlbumItem from "./AlbumItem";
+import BottomBar from "./BottomBar";
 
 function Album() {
   return (

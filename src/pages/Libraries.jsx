@@ -2,24 +2,15 @@ import BottomBar from "../components/BottomBar";
 import TopBar from "../components/TopBar";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import LibraryCard from "../components/LibraryCard";
 import Space from "../components/Space";
 
 function Libraries() {
   const navigate = useNavigate();
-  const { user, createPlayList } = useAuth();
+  const { user, createPlayList, playlist } = useAuth();
   const [show, setShow] = useState(false);
   const [playlistName, setPlayListName] = useState("");
-  const [libraries, setLibraries] = useState(function () {
-    if (!user) {
-      return [];
-    }
-    const data = localStorage.getItem(user.email);
-    if (data) {
-      return JSON.parse(data);
-    }
-  });
 
   function openLibraryForm() {
     if (!user) {
@@ -30,27 +21,9 @@ function Libraries() {
   }
 
   function createLibrary(e) {
-    e.preventDefault();
-    setLibraries([
-      ...libraries,
-      {
-        name: playlistName,
-        songs: [],
-      },
-    ]);
-
+    createPlayList(playlistName);
     setShow(false);
   }
-
-  useEffect(
-    function () {
-      if (!user) {
-        return;
-      }
-      createPlayList(libraries);
-    },
-    [libraries, createPlayList, user]
-  );
 
   return (
     <div>
@@ -59,15 +32,7 @@ function Libraries() {
         <div className="font-bold text-[30px] py-2 flex justify-between pr-8">
           Your Libraries
           <button className="" onClick={openLibraryForm}>
-            <svg
-              class="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              viewBox="0 0 24 24"
-            >
-              <path d="M12 4v16m8-8H4" />
-            </svg>
+            <p className="text-sm font-bold">Create +</p>
           </button>
         </div>
         {show && (
@@ -110,7 +75,7 @@ function Libraries() {
           </form>
         )}
         <div className="p-2 flex flex-col gap-5">
-          {libraries.map((card, index) => (
+          {playlist.map((card, index) => (
             <LibraryCard key={index} card={card} />
           ))}
         </div>

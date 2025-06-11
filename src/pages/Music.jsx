@@ -17,15 +17,14 @@ function Music({ user }) {
     "Friday",
     "Saturday",
   ];
-  console.log(day);
   return (
     <>
       <TopBar user={user} />
-      <section class="mt-6 px-4">
-        <h2 class="text-4xl font-extrabold text-green-400 tracking-tight">
+      <section className="mt-6 px-4">
+        <h2 className="text-4xl font-extrabold text-green-400 tracking-tight">
           NEW MUSIC {day.at(index)}
         </h2>
-        <p class="text-gray-400 mt-2">
+        <p className="text-gray-400 mt-2">
           Catch all the latest music from artists, plus new singles. Updates
           everyday.
         </p>

@@ -2,6 +2,8 @@ import { albumsData, assets, songsData } from "../assets/assets";
 import { useParams } from "react-router-dom";
 import TopBar from "../components/TopBar";
 import SongCard from "../components/SongCard";
+import BottomBar from "../components/BottomBar";
+import Space from "../components/Space";
 
 const DisplayAlbum = () => {
   const { id } = useParams();
@@ -45,6 +47,8 @@ const DisplayAlbum = () => {
       {songsData.map((item, index) => (
         <SongCard index={index} item={item} />
       ))}
+      <Space />
+      <BottomBar />
     </>
   );
 };

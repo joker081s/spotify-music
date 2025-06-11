@@ -6,7 +6,7 @@ import { useContext, useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 
 function Player() {
-  const { user } = useAuth();
+  const { user, addSongToPlaylist, removeSongFromPlaylist } = useAuth();
   const list = user ? JSON.parse(localStorage.getItem(user.email)) : null;
 
   const {
@@ -25,113 +25,45 @@ function Player() {
 
   const [value, setValue] = useState(-1);
   const [like, setLike] = useState(function () {
-    const value = user ? JSON.parse(localStorage.getItem(user.email)) : null;
     if (!user) {
       return false;
     }
-    const data = value.at(0);
-    for (let i = 0; i < data.songs.length; i++) {
-      if (track.name === data.songs.at(i).name) {
-        return true;
-      }
-    }
-
-    return false;
+    const data = JSON.parse(localStorage.getItem(user.email)).at(0);
+    return data.songs.find((song) => track.id === song.id);
   });
 
-  useEffect(
-    function () {
-      const data = list.at(0);
-      let store = [];
-      let find = false;
-      if (like) {
-        for (let j = 0; j < list.at(0).songs.length; j++) {
-          if (data.songs.at(j).name === track.name) {
-            find = true;
-          }
-        }
+  useEffect(() => {
+    if (!user || !track) return;
 
-        if (find) {
-          store = [...store, data];
-        } else {
-          store = [
-            ...store,
-            {
-              name: data.name,
-              songs: [...data.songs, track],
-            },
-          ];
-        }
-        for (let i = 1; i < list.length; i++) {
-          store = [...store, list.at(i)];
-        }
-      } else {
-        let tempSong = [];
-        for (let j = 0; j < list.at(0).songs.length; j++) {
-          if (data.songs.at(j).name !== track.name) {
-            tempSong = [...tempSong, data.songs.at(j)];
-          }
-        }
+    if (like) {
+      addSongToPlaylist("Liked Songs", track);
+    } else {
+      removeSongFromPlaylist("Liked Songs", track);
+    }
+  }, [like, track, user]);
 
-        store = [
-          ...store,
-          {
-            name: data.name,
-            songs: tempSong,
-          },
-        ];
+  function handleLike() {
+    setLike((a) => !a);
+    console.log(like);
+  }
 
-        for (let i = 1; i < list.length; i++) {
-          store = [...store, list.at(i)];
-        }
-      }
+  useEffect(() => {
+    if (value === -1) {
+      return;
+    }
 
-      localStorage.setItem(user.email, JSON.stringify(store));
-    },
-    [like, track]
-  );
+    addSongToPlaylist(list.at(value).name, track);
+    setValue(-1);
+  }, [track, value, addSongToPlaylist, list]);
 
-  useEffect(
-    function () {
-      if (!user) {
-        return;
-      }
-
-      if (value === -1) {
-        return;
-      }
-
-      console.log(value);
-      const data = list.at(value);
-      let store = [];
-      for (let i = 0; i < list.length; i++) {
-        if (data.name === list.at(i).name) {
-          let find = false;
-          for (let j = 0; j < list.at(i).songs.length; j++) {
-            if (list.at(i).songs.at(j).name === track.name) {
-              find = true;
-            }
-          }
-          if (!find) list.at(i).songs = [...data.songs, track];
-        }
-        store = [...store, list.at(i)];
-      }
-      localStorage.setItem(user.email, JSON.stringify(store));
-      setValue(-1);
-      setLike(true);
-    },
-    [value, track, user]
-  );
   return (
     <div>
       <TopBar />
-      <div class="mt-5 flex justify-center px-4 w-full">
+      <div className="mt-5 flex justify-center px-4 w-full">
         <h2 className="text-3xl font-bold">Player</h2>
-        {/* <img src="" alt="Album Cover" class="rounded-lg" /> */}
       </div>
 
-      {/* <!-- Song Info --> */}
-      <div class="mt-6 px-4 h-[50vh] w-full">
+      <div className="mt-6 px-4 h-[50vh] w-full">
         <div className="items-center gap-4 flex flex-col justify-center h-full">
           <img className="w-[40vw] lg:w-[10vw]" src={track.image} alt="" />
 
@@ -142,8 +74,7 @@ function Player() {
         </div>
       </div>
 
-      {/* <!-- Progress Bar --> */}
-      <div class="mt-4 px-4 w-full">
+      <div className="mt-4 px-4 w-full">
         <div className="flex items-center gap-5 justify-center">
           <p className="w-10 text-xs text-right">
             {time.currentTime.minute}:{time.currentTime.second}
@@ -177,8 +108,7 @@ function Player() {
         </div>
       </div>
 
-      {/* <!-- Playback Controls --> */}
-      <div class="mt-6 px-10 flex items-center justify-between text-2xl">
+      <div className="mt-6 px-10 flex items-center justify-between text-2xl">
         <img
           className="w-4 cursor-pointer opacity-50 hover:opacity-100"
           src={assets.shuffle_icon}
@@ -221,18 +151,18 @@ function Player() {
         />
       </div>
       <div className="flex justify-between px-20 mt-4">
-        <div onClick={() => setLike((like) => !like)}>
+        <div onClick={handleLike}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill={like ? "green" : "none"}
             viewBox="0 0 24 24"
-            stroke-width="1.5"
+            strokeWidth="1.5"
             stroke="green"
             className="size-6"
           >
             <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              strokeLinecap="round"
+              strokeLinejoin="round"
               d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
             />
           </svg>

@@ -15,7 +15,7 @@ import DisplayAlbum from "./pages/DisplayAlbum";
 function App() {
   return (
     <>
-      <div className="bg-[#111827] w-[100wh] h-[100vh] overflow-x-none overflow-y-auto text-white">
+      <div className="bg-[#111827] w-[100wh] h-[100vh] overflow-x-none overflow-y-auto text-white scrollbar scrollbar-thumb-transparent scrollbar-track-transparent">
         <BrowserRouter>
           <AuthProvider>
             <Routes>

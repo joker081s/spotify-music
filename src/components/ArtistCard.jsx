@@ -4,9 +4,9 @@ function ArtistCard({ card }) {
       <img
         src={card.image}
         alt="Gurnam Bhullar"
-        class="w-12 h-12 rounded-full object-cover"
+        className="w-12 h-12 rounded-full object-cover"
       />
-      <span class="font-medium text-white">{card.name}</span>
+      <span className="font-medium text-white">{card.name}</span>
     </div>
   );
 }

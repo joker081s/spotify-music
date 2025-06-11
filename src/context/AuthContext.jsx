@@ -3,16 +3,31 @@ import React, { createContext, useState, useContext, useEffect } from "react";
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(function () {
+    const data = JSON.parse(localStorage.getItem("user"));
+    setLoading(false);
+    return data;
+  });
+  const [playlist, setPlaylist] = useState(function () {
+    if (!user) {
+      return [];
+    }
+    return JSON.parse(localStorage.getItem(user.email));
+  });
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
+    if (!user) {
+      return;
     }
-    setLoading(false);
-  }, []);
+    if (playlist.length === 0) {
+      setPlaylist((playlist) => [
+        ...playlist,
+        { name: "Liked Songs", songs: [] },
+      ]);
+    }
+    localStorage.setItem(user.email, JSON.stringify(playlist));
+  }, [playlist, user]);
 
   const login = (userData) => {
     const registeredUsers = JSON.parse(
@@ -97,10 +112,47 @@ export const AuthProvider = ({ children }) => {
     return false;
   };
 
-  const createPlayList = (libraries) => {
+  const createPlayList = (playlistName) => {
     setLoading(true);
-    localStorage.setItem(user.email, JSON.stringify(libraries));
+    setPlaylist((playlist) => [...playlist, { name: playlistName, songs: [] }]);
     setLoading(false);
+  };
+
+  const addSongToPlaylist = (playListName, song) => {
+    setPlaylist((playlist) =>
+      playlist.map((obj) => {
+        if (obj.name === playListName) {
+          const alreadyExists = obj.songs.some((track) => track.id === song.id);
+
+          if (!alreadyExists) {
+            return { ...obj, songs: [...obj.songs, song] };
+          }
+        }
+
+        return obj;
+      })
+    );
+  };
+
+  const removeSongFromPlaylist = (playListName, song) => {
+    setPlaylist((playlist) =>
+      playlist.map((obj) => {
+        if (obj.name === playListName) {
+          const updatedSongs = obj.songs.filter(
+            (track) => track.id !== song.id
+          );
+          return { ...obj, songs: updatedSongs };
+        }
+
+        return obj;
+      })
+    );
+  };
+
+  const handleRemoveSongPlaylist = (playListName) => {
+    setPlaylist((playlist) =>
+      playlist.filter((obj) => obj.name !== playListName)
+    );
   };
 
   if (loading) {
@@ -109,7 +161,18 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, login, logout, register, alreadyLogged, createPlayList }}
+      value={{
+        user,
+        login,
+        logout,
+        register,
+        alreadyLogged,
+        createPlayList,
+        playlist,
+        addSongToPlaylist,
+        removeSongFromPlaylist,
+        handleRemoveSongPlaylist,
+      }}
     >
       {children}
     </AuthContext.Provider>

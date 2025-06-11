@@ -54,7 +54,7 @@ function Profile() {
                 </button>
               </div>
             </div>
-            <hr class="border-gray-800 mb-4 mt-6" />
+            <hr className="border-gray-800 mb-4 mt-6" />
           </div>
         )}
 
