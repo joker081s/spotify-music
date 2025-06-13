@@ -32,7 +32,7 @@ function Libraries() {
         <div className="font-bold text-[30px] py-2 flex justify-between pr-8">
           Your Libraries
           <button className="" onClick={openLibraryForm}>
-            <p className="text-sm font-bold">Create +</p>
+            <p className="text-sm font-bold">+ Create</p>
           </button>
         </div>
         {show && (
